@@ -58,8 +58,8 @@ static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
 void FRAM_DMA_Init();
-void FRAM_DMA_Read(uint8_t *dst, unsigned long len);
-void FRAM_DMA_Write(uint8_t *src, unsigned long len);
+void FRAM_DMA_Read(uint8_t *addr, uint8_t *dst, unsigned long len);
+void FRAM_DMA_Write(uint8_t *addr, uint8_t *src, unsigned long len);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -100,10 +100,14 @@ int main(void)
   /* USER CODE BEGIN 2 */
   FRAM_DMA_Init();
   uint8_t temp[1];
+  uint8_t addr[3];
+  addr[0] = 0x00;
+  addr[1] = 0x01;
+  addr[2] = 0x01;
   temp[0] = 13;
-  FRAM_DMA_Write(temp, 1);
+  FRAM_DMA_Write(addr, temp, 1);
   temp[0] = 2;
-  FRAM_DMA_Read(temp, 1);
+  FRAM_DMA_Read(addr, temp, 1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -315,13 +319,13 @@ void FRAM_DMA_Init(){
 
 }
 
-void FRAM_DMA_Read(uint8_t *dst, unsigned long len){
+void FRAM_DMA_Read(uint8_t *addr, uint8_t *dst, unsigned long len){
 	uint8_t buf[4];
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 	buf[0] = 0x03; //CMD_READ;
-	buf[1] = 0x00;
-	buf[2] = 0x05;
-	buf[3] = 0x00;
+	buf[1] = addr[0];
+	buf[2] = addr[1];
+	buf[3] = addr[2];
 	HAL_SPI_Transmit(&hspi1, buf, 4, HAL_MAX_DELAY);
 	HAL_SPI_Receive_DMA(&hspi1, dst, len);
 	//HAL_SPI_Receive(&hspi1, dst, len, HAL_MAX_DELAY);
@@ -329,7 +333,7 @@ void FRAM_DMA_Read(uint8_t *dst, unsigned long len){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
 
-void FRAM_DMA_Write(uint8_t *src, unsigned long len){
+void FRAM_DMA_Write(uint8_t *addr, uint8_t *src, unsigned long len){
 	uint8_t buf[4];
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 	buf[0] = 0x06; //CMD_WREN
@@ -338,9 +342,9 @@ void FRAM_DMA_Write(uint8_t *src, unsigned long len){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_RESET);
 
 	buf[0] = 0x02; //CMD_WRITE;
-	buf[1] = 0x00;
-	buf[2] = 0x05;
-	buf[3] = 0x00;
+	buf[1] = addr[0];
+	buf[2] = addr[1];
+	buf[3] = addr[2];
 	HAL_SPI_Transmit(&hspi1, buf, 4, HAL_MAX_DELAY);
 	HAL_SPI_Transmit_DMA(&hspi1, src, len);
 	//HAL_SPI_Transmit(&hspi1, src, len, HAL_MAX_DELAY);
