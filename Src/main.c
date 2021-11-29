@@ -24,6 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include "string.h"
 #include "stdio.h"
+#include "stm32_ext_fram_dma.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -57,9 +58,11 @@ static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
+/*
 void FRAM_DMA_Init();
 void FRAM_DMA_Read(uint8_t *addr, uint8_t *dst, unsigned long len);
 void FRAM_DMA_Write(uint8_t *addr, uint8_t *src, unsigned long len);
+*/
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -99,17 +102,24 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   FRAM_DMA_Init();
-  uint8_t temp[1];
+  uint8_t temp_0[256];
+  uint8_t temp_1[256];
+  int i = 0;
+  for(i = 0; i < 256; i++){
+	  temp_0[i] = i;
+	  temp_1[i] = 0;
+  }
+
   uint8_t addr[3];
   addr[0] = 0x00;
   addr[1] = 0x01;
   addr[2] = 0x01;
-  temp[0] = 13;
-  FRAM_DMA_Write(addr, temp, 1);
-  temp[0] = 2;
-  FRAM_DMA_Read(addr, temp, 1);
+  //temp[0] = 13;
+  FRAM_DMA_Write(addr, temp_0, sizeof(temp_0));
+  //temp[0] = 2;
+  FRAM_DMA_Read(addr, temp_1, sizeof(temp_1));
   /* USER CODE END 2 */
-
+  memset(temp_1, 0, sizeof(temp_1));
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -201,7 +211,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_16;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -304,6 +314,7 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+/*
 void FRAM_DMA_Init(){
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 	uint8_t buf[2];
@@ -351,6 +362,7 @@ void FRAM_DMA_Write(uint8_t *addr, uint8_t *src, unsigned long len){
 	//while(completed_tx == 0){};
 	HAL_GPIO_WritePin(SPI1_CS_GPIO_Port, SPI1_CS_Pin, GPIO_PIN_SET);
 }
+*/
 /* USER CODE END 4 */
 
 /**
