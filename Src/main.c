@@ -115,7 +115,7 @@ int main(void)
   addr[1] = 0x01;
   addr[2] = 0x01;
   //temp[0] = 13;
-  FRAM_DMA_Write(addr, temp_0, sizeof(temp_0));
+  //FRAM_DMA_Write(addr, temp_0, sizeof(temp_0));
   //temp[0] = 2;
   FRAM_DMA_Read(addr, temp_1, sizeof(temp_1));
   /* USER CODE END 2 */
